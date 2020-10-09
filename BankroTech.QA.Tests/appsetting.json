@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "OperationalConnection": "Server=localhost;Port=5432;Database=MeetingsApp;User ID=postgres;Password=password;"
+  }
+}
