@@ -1,5 +1,6 @@
 ﻿using BankroTech.QA.Framework.Attributes;
 using BankroTech.QA.Framework.PageObjects;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 
 namespace BankroTech.QA.Tests.PageObjects
@@ -7,7 +8,7 @@ namespace BankroTech.QA.Tests.PageObjects
     [PageName(name: "Создание собрания")]
     public class CreateMeetingPageObject : BasePageObject
     {
-        protected override string Url => "http://localhost:64507/#/meeting";
+        protected override string Url => "/meeting";
 
         [PageElement(name: "Наименование")]
         public IWebElement Name => WebDriver.FindElement(By.CssSelector("input[name = 'name']"));
@@ -51,7 +52,7 @@ namespace BankroTech.QA.Tests.PageObjects
         [PageElement(name: "Сохранить")]
         public IWebElement SaveBtn => WebDriver.FindElement(By.ClassName("b-floating_button-el"));
 
-        public CreateMeetingPageObject(IWebDriver webDriver) : base(webDriver)
+        public CreateMeetingPageObject(IWebDriver webDriver, IConfigurationRoot configuration) : base(webDriver, configuration)
         {
 
         }

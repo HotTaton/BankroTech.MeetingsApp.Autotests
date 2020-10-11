@@ -8,17 +8,17 @@ using System.Linq;
 
 namespace BankroTech.QA.Framework.Helpers
 {
-    public class WaitHelper
+    public class WaitHelper : IWaitHelper
     {
         private const int DEFAULT_WAIT_INTERVAL = 30;
 
         private static readonly string[] waitForHttpMethods = new string[] { "GET", "POST", "PUT", "DELETE" };
 
         private readonly IWebDriver _webDriver;
-        private readonly PageFactory _pageFactory;
+        private readonly IPageFactory _pageFactory;
         private readonly IProxyHttpService _httpService;
 
-        public WaitHelper(IWebDriver webDriver, PageFactory pageFactory, IProxyHttpService httpService)
+        public WaitHelper(IWebDriver webDriver, IPageFactory pageFactory, IProxyHttpService httpService)
         {
             _webDriver = webDriver;
             _pageFactory = pageFactory;

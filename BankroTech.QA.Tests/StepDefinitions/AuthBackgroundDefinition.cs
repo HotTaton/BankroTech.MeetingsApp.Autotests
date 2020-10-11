@@ -6,14 +6,15 @@ using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Tests.StepDefinitions
 {
+    //ToDo можно обернуть какой-нибудь сервис-враппер над IWebDriver и хранить там флаг авторизации
     [Binding]
     public class AuthDefinition
     {
         private readonly FeatureContext _featureContext;
-        private readonly PageFactory _pageFactory;
-        private readonly WaitHelper _waitHelper;
+        private readonly IPageFactory _pageFactory;
+        private readonly IWaitHelper _waitHelper;
 
-        public AuthDefinition(FeatureContext featureContext, PageFactory pageFactory, WaitHelper waitHelper)
+        public AuthDefinition(FeatureContext featureContext, IPageFactory pageFactory, IWaitHelper waitHelper)
         {
             _featureContext = featureContext;
             _pageFactory = pageFactory;

@@ -1,4 +1,5 @@
 ﻿using BankroTech.QA.Framework.Attributes;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using System;
@@ -9,18 +10,28 @@ using System.Linq.Expressions;
 namespace BankroTech.QA.Framework.PageObjects
 {
     public abstract class BasePageObject
-    {
+    {        
+        protected string AbsoluteUrl { get; private set; }
         protected abstract string Url { get; }
 
         private Dictionary<string, Func<IWebElement>> _pageElementGetters = new Dictionary<string, Func<IWebElement>>();
 
         protected IWebDriver WebDriver { get; }
 
-        public BasePageObject(IWebDriver webDriver)
+        public BasePageObject(IWebDriver webDriver, IConfigurationRoot configuration)
         {
             WebDriver = webDriver;
+
+            var applicationName = configuration.GetSection("ApplicationName").Value;
+            if (!applicationName.EndsWith("/"))
+            {
+                applicationName += "/";
+            }
+
+            AbsoluteUrl = $"{applicationName}#{Url}";
+
             InitPropertyDictionary();
-        }
+        }        
 
         private void InitPropertyDictionary()
         {
@@ -58,7 +69,7 @@ namespace BankroTech.QA.Framework.PageObjects
             return default;
         }
 
-        public virtual bool IsCurrent => string.Equals(Url, WebDriver.Url, StringComparison.OrdinalIgnoreCase);
+        public virtual bool IsCurrent => string.Equals(AbsoluteUrl, WebDriver.Url, StringComparison.OrdinalIgnoreCase);
 
         public bool GoToParentTab()
         {
@@ -75,7 +86,7 @@ namespace BankroTech.QA.Framework.PageObjects
             return false;
         }
 
-        public void GoToPage() => WebDriver.Navigate().GoToUrl(Url);
+        public void GoToPage() => WebDriver.Navigate().GoToUrl(AbsoluteUrl);
 
         public void SetInput(string name, string value) => this[name].SendKeys(value);
 

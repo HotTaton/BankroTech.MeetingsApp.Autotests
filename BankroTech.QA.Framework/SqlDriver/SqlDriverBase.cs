@@ -7,9 +7,9 @@ namespace BankroTech.QA.Framework.SqlDriver
 {
     public abstract class SqlDriverBase : ISqlDriver
     {
-        private readonly TemplateResolverService _resolverService;
+        private readonly ITemplateResolverService _resolverService;
 
-        public SqlDriverBase(TemplateResolverService resolverService)
+        public SqlDriverBase(ITemplateResolverService resolverService)
         {
             _resolverService = resolverService;
         }

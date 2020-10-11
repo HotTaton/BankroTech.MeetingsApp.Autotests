@@ -9,7 +9,7 @@ namespace BankroTech.QA.Framework.SqlDriver
     {
         private readonly IConfigurationRoot _configuration;
 
-        public PgsqlDriver(TemplateResolverService resolverService, IConfigurationRoot configuration)
+        public PgsqlDriver(ITemplateResolverService resolverService, IConfigurationRoot configuration)
             : base(resolverService)
         {
             _configuration = configuration;

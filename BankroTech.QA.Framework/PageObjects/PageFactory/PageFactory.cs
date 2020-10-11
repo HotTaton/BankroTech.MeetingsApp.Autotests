@@ -1,5 +1,5 @@
-﻿using BankroTech.QA.Framework.Attributes;
-using BoDi;
+﻿using Autofac;
+using BankroTech.QA.Framework.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,20 +9,21 @@ namespace BankroTech.QA.Framework.PageObjects.PageFactory
     /// <summary>
     /// Contains information about all pages
     /// </summary>
-    public class PageFactory
+    public class PageFactory : IPageFactory
     {
         private readonly Dictionary<string, Type> _pages = new Dictionary<string, Type>();
-        private readonly IObjectContainer _objectContainer;
+        private readonly IComponentContext _objectContainer;
 
-        public PageFactory(IObjectContainer objectContainer)
+        public PageFactory(IComponentContext objectContainer)
         {
 
-            var items = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes().Where(t => Attribute.IsDefined(t, typeof(PageNameAttribute)) && typeof(BasePageObject).IsAssignableFrom(t))).ToArray();
-            /*var items = typeof(PageFactory)
-                    .Assembly
-                    .GetTypes()
-                    .Where(t => Attribute.IsDefined(t, typeof(PageNameAttribute)) && typeof(BasePageObject).IsAssignableFrom(t))
-                    .ToArray();*/
+            var items = AppDomain
+                            .CurrentDomain
+                            .GetAssemblies()
+                            .SelectMany(assembly => assembly
+                                                        .GetTypes()
+                                                        .Where(t => Attribute.IsDefined(t, typeof(PageNameAttribute)) && typeof(BasePageObject).IsAssignableFrom(t)))
+                            .ToArray();
 
             foreach (var item in items)
             {

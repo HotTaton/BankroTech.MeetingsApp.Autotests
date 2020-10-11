@@ -1,6 +1,7 @@
 ﻿using BankroTech.QA.Framework.Attributes;
 using BankroTech.QA.Framework.Helpers;
 using BankroTech.QA.Framework.PageObjects;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 
 namespace BankroTech.QA.Tests.PageObjects
@@ -8,14 +9,14 @@ namespace BankroTech.QA.Tests.PageObjects
     [PageName(name: "Подтверждение")]
     public class ConfirmationPage : BasePageObject
     {
-        private readonly WaitHelper _waitHelper;
+        private readonly IWaitHelper _waitHelper;
 
-        public ConfirmationPage(IWebDriver webDriver, WaitHelper waitHelper) : base(webDriver)
+        public ConfirmationPage(IWebDriver webDriver, IWaitHelper waitHelper, IConfigurationRoot configuration) : base(webDriver, configuration)
         {
             _waitHelper = waitHelper;
         }
 
-        protected override string Url => "http://localhost:64507/#/confirm";
+        protected override string Url => "/confirm";
 
         [PageElement(name: "Код")]
         public IWebElement Phone => WebDriver.FindElement(By.CssSelector("input[name = 'code']"));

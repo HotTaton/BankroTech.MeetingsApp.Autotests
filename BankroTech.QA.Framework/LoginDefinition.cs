@@ -15,17 +15,17 @@ namespace BankroTech.QA.Framework
     public sealed class LoginDefinition
     {
         private readonly ScenarioContext _scenarioContext;
-        private readonly PageFactory _pageFactory;
-        private readonly WaitHelper _waitHelper;
-        private readonly TemplateResolverService _valueResolver;
+        private readonly IPageFactory _pageFactory;
+        private readonly IWaitHelper _waitHelper;
+        private readonly ITemplateResolverService _valueResolver;
         private readonly IProxyHttpService _httpService;
         private readonly ParamResolverWrapper _paramResolver;
         private readonly ISqlDriver _sqlQueryService;
 
         public LoginDefinition(ScenarioContext scenarioContext,
-                               PageFactory pageFactory,
-                               WaitHelper waitHelper,
-                               TemplateResolverService templateResolver,
+                               IPageFactory pageFactory,
+                               IWaitHelper waitHelper,
+                               ITemplateResolverService templateResolver,
                                IProxyHttpService httpService,
                                ParamResolverWrapper paramResolver,
                                ISqlDriver sqlQueryService)

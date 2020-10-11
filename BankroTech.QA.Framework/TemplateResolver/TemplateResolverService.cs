@@ -1,5 +1,5 @@
-﻿using BankroTech.QA.Framework.TemplateResolver.Resolvers;
-using BoDi;
+﻿using Autofac;
+using BankroTech.QA.Framework.TemplateResolver.Resolvers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +8,12 @@ using System.Text.RegularExpressions;
 
 namespace BankroTech.QA.Framework.TemplateResolver
 {
-    public class TemplateResolverService
+    public class TemplateResolverService : ITemplateResolverService
     {
         private readonly Dictionary<string, Type> _templateResolvers;
-        private readonly IObjectContainer _objectContainer;
+        private readonly IComponentContext _objectContainer;
 
-        public TemplateResolverService(IObjectContainer objectContainer)
+        public TemplateResolverService(IComponentContext objectContainer)
         {
             _objectContainer = objectContainer;
             _templateResolvers = new Dictionary<string, Type>

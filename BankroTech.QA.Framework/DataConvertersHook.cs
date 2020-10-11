@@ -5,6 +5,9 @@ using TechTalk.SpecFlow.Assist.ValueComparers;
 
 namespace BankroTech.QA.Framework
 {
+    /// <summary>
+    /// Set up enchanced custom data converters
+    /// </summary>
     [Binding]
     public sealed class DataConvertersHook
     {

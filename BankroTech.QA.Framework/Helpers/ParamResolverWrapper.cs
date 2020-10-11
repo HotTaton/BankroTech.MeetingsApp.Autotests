@@ -4,9 +4,9 @@ namespace BankroTech.QA.Framework.Helpers
 {
     public sealed class ParamResolverWrapper
     {
-        private readonly TemplateResolverService _resolverService;
+        private readonly ITemplateResolverService _resolverService;
 
-        public ParamResolverWrapper(TemplateResolverService resolverService)
+        public ParamResolverWrapper(ITemplateResolverService resolverService)
         {
             _resolverService = resolverService;
         }

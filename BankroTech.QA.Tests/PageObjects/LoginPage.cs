@@ -1,5 +1,6 @@
 ﻿using BankroTech.QA.Framework.Attributes;
 using BankroTech.QA.Framework.PageObjects;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 
 namespace BankroTech.QA.Tests.PageObjects
@@ -7,7 +8,7 @@ namespace BankroTech.QA.Tests.PageObjects
     [PageName(name: "Логин")]
     public class LoginPage : BasePageObject
     {
-        public LoginPage(IWebDriver webDriver) : base(webDriver) { }
+        public LoginPage(IWebDriver webDriver, IConfigurationRoot configuration) : base(webDriver, configuration) { }
 
         #region UI Elements
 
@@ -23,7 +24,7 @@ namespace BankroTech.QA.Tests.PageObjects
         [PageElement(name: "Войти")]
         public IWebElement LoginBtn => WebDriver.FindElement(By.ClassName("b-authentication-form-button--auth"));
 
-        protected override string Url => "http://localhost:64507/#/login";
+        protected override string Url => "/login";
         #endregion UI Elements
 
         #region Actions     
