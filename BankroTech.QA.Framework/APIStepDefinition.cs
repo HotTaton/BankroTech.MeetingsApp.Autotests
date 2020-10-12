@@ -1,4 +1,7 @@
-﻿using BankroTech.QA.Framework.Helpers;
+﻿using BankroTech.QA.Framework.API;
+using BankroTech.QA.Framework.Helpers;
+using BankroTech.QA.Framework.TemplateResolver;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Framework
@@ -8,16 +11,22 @@ namespace BankroTech.QA.Framework
     {
         private readonly IWaitHelper _waitHelper;
         private readonly ParamResolverWrapper _paramResolver;
+        private readonly RestClientService _restClient;
+        private readonly ITemplateResolverService _resolverService;
 
         private readonly IContextHelper _scenarioContext;
 
         public APIStepDefinition(IContextHelper scenarioContext,
                                  IWaitHelper waitHelper,
-                                 ParamResolverWrapper paramResolver)
+                                 ParamResolverWrapper paramResolver,
+                                 RestClientService restClient,
+                                 ITemplateResolverService resolverService)
         {
             _scenarioContext = scenarioContext;
+            _restClient = restClient;
             _paramResolver = paramResolver;
-            _waitHelper = waitHelper;            
+            _waitHelper = waitHelper;
+            _resolverService = resolverService;
         }        
 
         //ToDo: сделать регулярку, которая позволит писать много параметров
@@ -28,5 +37,22 @@ namespace BankroTech.QA.Framework
             var paramValue = _paramResolver.Resolve(requestUrl);
             _scenarioContext.SetParameter(paramName, paramValue);                
         }
+
+        [Given(@"посылаю запрос ""(.*)"" с телом")]
+        [When(@"посылаю запрос ""(.*)"" с телом")]
+        public void GivenПосылаюЗапросСТелом(string action, string jsonBody)
+        {
+            var resolvedBody = _resolverService.Resolve(jsonBody);
+            _restClient.PostRequest(action, resolvedBody);
+        }
+
+        [Then(@"результат ""(.*)"" истина")]
+        public void ThenРезультатИстина(string requestUrl)
+        {
+            _waitHelper.WaitUntilAllAjaxIsCompleted();
+            var paramValue = _paramResolver.Resolve(requestUrl);
+            Assert.IsTrue(bool.TryParse(paramValue, out var result) && result);
+        }
+
     }
 }

@@ -19,6 +19,7 @@ namespace BankroTech.QA.Framework
             _sqlQueryService = sqlQueryService;                   
         }
 
+        [Given(@"выполняю запрос")]
         [Then(@"выполняю запрос")]
         public void ThenВыполняюЗапрос(string sqlRequest)
         {

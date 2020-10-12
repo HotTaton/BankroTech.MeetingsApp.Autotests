@@ -1,5 +1,6 @@
 ﻿using BankroTech.QA.Framework.Helpers;
 using BankroTech.QA.Framework.Proxy;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -27,7 +28,12 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
 
             if (string.IsNullOrEmpty(result))
             {
-                result = TryGetResultFromResponseBody(arg);
+                result = TryGetResultFromSqlQueryResult(arg);
+                
+                if (string.IsNullOrEmpty(result))
+                {                    
+                    result = TryGetResultFromResponseBody(arg);                                        
+                }
             }
 
             return result;
@@ -36,6 +42,26 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
         private string TryGetResultFromContextVariableByName(string variableName)
         {
             return _scenarioContext.GetParameter<string>(variableName) ?? string.Empty;            
+        }
+
+        private string TryGetResultFromSqlQueryResult(string arg)
+        {
+            (var locator, var index, var paramName) = ProcessArgument(arg);
+
+            if (string.Equals("Результат SQL запроса", locator, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!index.HasValue)
+                {
+                    index = 0;
+                }
+
+                var sqlResult = _scenarioContext.StoredData;
+                return sqlResult[index.Value][paramName].ToString();
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         private string TryGetResultFromResponseBody(string arg)
@@ -64,11 +90,11 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
             return currentElem.ToString();
         }
 
-        private (string url, int? index, string paramName) ProcessArgument(string arg)
+        private (string locator, int? index, string paramName) ProcessArgument(string arg)
         {
-            var match = Regex.Match(arg, @"(?'Url'.+?)(?:\[(?'Index'\d+)\])?\.(?'ParamName'.+)", RegexOptions.Compiled);
+            var match = Regex.Match(arg, @"(?'Locator'.+?)(?:\[(?'Index'\d+)\])?\.(?'ParamName'.+)", RegexOptions.Compiled);
 
-            var url = match.Groups["Url"].Value;
+            var locator = match.Groups["Locator"].Value.Trim();
             int? index = null;
             if (!string.IsNullOrEmpty(match.Groups["Position"].Value))
             {
@@ -76,7 +102,7 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
             }
             var paramName = match.Groups["ParamName"].Value;
 
-            return (url, index, paramName);
+            return (locator, index, paramName);
         }
     }
 }

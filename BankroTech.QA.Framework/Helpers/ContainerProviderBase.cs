@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using BankroTech.QA.Framework.API;
 using BankroTech.QA.Framework.Attributes;
 using BankroTech.QA.Framework.PageObjects;
 using BankroTech.QA.Framework.PageObjects.PageFactory;
@@ -55,6 +56,8 @@ namespace BankroTech.QA.Framework.Helpers
             builder.RegisterTypes(pageObjects).SingleInstance();
 
             builder.RegisterInstance(WebDriverContainer.WebDriver).As<IWebDriver>();
+
+            builder.RegisterType<RestClientService>().AsSelf().SingleInstance();
 
             return builder;
         }
