@@ -1,42 +1,29 @@
-﻿using BankroTech.QA.Framework.Extensions;
-using BankroTech.QA.Framework.Helpers;
+﻿using BankroTech.QA.Framework.Helpers;
 using BankroTech.QA.Framework.PageObjects;
 using BankroTech.QA.Framework.PageObjects.PageFactory;
-using BankroTech.QA.Framework.Proxy;
-using BankroTech.QA.Framework.SqlDriver;
 using BankroTech.QA.Framework.TemplateResolver;
 using NUnit.Framework;
-using System.Collections.Generic;
 using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Framework
 {
     [Binding]
-    public sealed class LoginDefinition
+    public sealed class InterfaceStepDefinition
     {
-        private readonly ScenarioContext _scenarioContext;
         private readonly IPageFactory _pageFactory;
-        private readonly IWaitHelper _waitHelper;
         private readonly ITemplateResolverService _valueResolver;
-        private readonly IProxyHttpService _httpService;
-        private readonly ParamResolverWrapper _paramResolver;
-        private readonly ISqlDriver _sqlQueryService;
+        private readonly IWaitHelper _waitHelper;
+        private readonly ScenarioContext _scenarioContext;
 
-        public LoginDefinition(ScenarioContext scenarioContext,
-                               IPageFactory pageFactory,
-                               IWaitHelper waitHelper,
-                               ITemplateResolverService templateResolver,
-                               IProxyHttpService httpService,
-                               ParamResolverWrapper paramResolver,
-                               ISqlDriver sqlQueryService)
+        public InterfaceStepDefinition(ScenarioContext scenarioContext,
+                                       IPageFactory pageFactory,
+                                       IWaitHelper waitHelper,
+                                       ITemplateResolverService templateResolver)
         {
-            _paramResolver = paramResolver;
-            _sqlQueryService = sqlQueryService;
             _scenarioContext = scenarioContext;
             _pageFactory = pageFactory;
             _waitHelper = waitHelper;
-            _valueResolver = templateResolver;
-            _httpService = httpService;
+            _valueResolver = templateResolver;            
         }
 
         [Given(@"я захожу на страницу ""(.*)""")]
@@ -83,38 +70,6 @@ namespace BankroTech.QA.Framework
         {
             var pageObj = _scenarioContext.Get<BasePageObject>("CurrentPageObj");
             pageObj.ClickOnExpansionPanel(elemName);
-        }
-
-        //ToDo: сделать регулярку, которая позволит писать много параметров
-        [When(@"сохраняю параметр ""(.*)"" из результата запроса ""(.*)""")]
-        public void WhenСохраняюПараметрИзРезультатаЗапроса(string paramName, string requestUrl)
-        {
-            _waitHelper.WaitUntilAllAjaxIsCompleted();
-            var paramValue = _paramResolver.Resolve(requestUrl);
-            _scenarioContext.Set(paramValue, string.Concat("Param:", paramName).ToUpper());
-        }
-
-
-        [When(@"я подставляю параметр в запрос")]
-        public void WhenЯПодставляюПараметрВЗапрос(string sqlRequest)
-        {
-            var resolvedRequest = _valueResolver.Resolve(sqlRequest);
-            _scenarioContext.Add("SqlRequest", resolvedRequest);
-        }
-
-        [Then(@"выполняю запрос")]
-        public void ThenВыполняюЗапрос(string sqlRequest)
-        {
-            var queryResult = _sqlQueryService.ExecuteQuery(sqlRequest);
-            _scenarioContext.Add("SqlQueryResult", queryResult);
-        }
-
-
-        [Then(@"вижу следующие данные")]
-        public void ThenВижуСледующиеДанные(Table table)
-        {
-            var sqlQueryResult = _scenarioContext.Get<List<Dictionary<string, object>>>("SqlQueryResult");
-            table.CompareToCustomTable(sqlQueryResult);
         }
 
         [Then(@"открывается новая вкладка со страницей ""(.*)""")]

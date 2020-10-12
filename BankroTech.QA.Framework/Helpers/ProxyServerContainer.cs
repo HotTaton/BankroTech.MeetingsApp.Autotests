@@ -5,7 +5,7 @@ using Titanium.Web.Proxy.Network;
 
 namespace BankroTech.QA.Framework.Helpers
 {
-    public static class ProxyServerContainer
+    internal static class ProxyServerContainer
     {
         private const int PROXY_PORT = 80;
         private static ProxyServer _proxyServer;
