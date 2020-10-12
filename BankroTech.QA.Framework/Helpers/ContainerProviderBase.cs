@@ -19,6 +19,8 @@ namespace BankroTech.QA.Framework.Helpers
         {
             var builder = new ContainerBuilder();
 
+            builder.RegisterType<ContextHelper>().As<IContextHelper>();
+
             builder.RegisterType<ParamResolverWrapper>().AsSelf();
             builder.RegisterType<WaitHelper>().As<IWaitHelper>();
             builder.RegisterType<PageFactory>().As<IPageFactory>();

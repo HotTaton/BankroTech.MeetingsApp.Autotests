@@ -1,17 +1,17 @@
-﻿using BankroTech.QA.Framework.Proxy;
+﻿using BankroTech.QA.Framework.Helpers;
+using BankroTech.QA.Framework.Proxy;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
 {
     public class ParamTemplateResolver : ITemplateResolver
     {
-        private readonly ScenarioContext _scenarioContext;
+        private readonly IContextHelper _scenarioContext;
         private readonly IProxyHttpService _httpService;
 
-        public ParamTemplateResolver(ScenarioContext scenarioContext, IProxyHttpService httpService)
+        public ParamTemplateResolver(IContextHelper scenarioContext, IProxyHttpService httpService)
         {
             _scenarioContext = scenarioContext;
             _httpService = httpService;
@@ -35,12 +35,7 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
 
         private string TryGetResultFromContextVariableByName(string variableName)
         {
-            var paramName = $"Param:{variableName}".ToUpper();
-            if (_scenarioContext.ContainsKey(paramName))
-            {
-                return _scenarioContext.Get<string>(paramName);
-            }
-            return string.Empty;
+            return _scenarioContext.GetParameter<string>(variableName) ?? string.Empty;            
         }
 
         private string TryGetResultFromResponseBody(string arg)

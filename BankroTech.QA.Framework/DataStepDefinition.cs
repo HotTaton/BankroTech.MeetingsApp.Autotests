@@ -1,5 +1,5 @@
 ﻿using BankroTech.QA.Framework.Extensions;
-using System.Collections.Generic;
+using BankroTech.QA.Framework.Helpers;
 using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Framework
@@ -7,9 +7,9 @@ namespace BankroTech.QA.Framework
     [Binding]
     public sealed class DataStepDefinition
     {
-        private readonly ScenarioContext _scenarioContext;
+        private readonly IContextHelper _scenarioContext;
 
-        public DataStepDefinition(ScenarioContext scenarioContext)
+        public DataStepDefinition(IContextHelper scenarioContext)
         {
             _scenarioContext = scenarioContext;
         }
@@ -17,7 +17,7 @@ namespace BankroTech.QA.Framework
         [Then(@"вижу следующие данные")]
         public void ThenВижуСледующиеДанные(Table table)
         {
-            var sqlQueryResult = _scenarioContext.Get<List<Dictionary<string, object>>>("SqlQueryResult");
+            var sqlQueryResult = _scenarioContext.StoredData;
             table.CompareToCustomTable(sqlQueryResult);
         }
     }

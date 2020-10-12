@@ -1,5 +1,4 @@
 ﻿using BankroTech.QA.Framework.Helpers;
-using BankroTech.QA.Framework.PageObjects;
 using BankroTech.QA.Framework.PageObjects.PageFactory;
 using BankroTech.QA.Framework.TemplateResolver;
 using NUnit.Framework;
@@ -13,9 +12,9 @@ namespace BankroTech.QA.Framework
         private readonly IPageFactory _pageFactory;
         private readonly ITemplateResolverService _valueResolver;
         private readonly IWaitHelper _waitHelper;
-        private readonly ScenarioContext _scenarioContext;
+        private readonly IContextHelper _scenarioContext;
 
-        public InterfaceStepDefinition(ScenarioContext scenarioContext,
+        public InterfaceStepDefinition(IContextHelper scenarioContext,
                                        IPageFactory pageFactory,
                                        IWaitHelper waitHelper,
                                        ITemplateResolverService templateResolver)
@@ -31,13 +30,13 @@ namespace BankroTech.QA.Framework
         {
             var pageObj = _pageFactory[pageName];
             pageObj.GoToPage();
-            _scenarioContext.Set(pageObj, "CurrentPageObj");
+            _scenarioContext.CurrentPage = pageObj;
         }
 
         [Given(@"ввожу в поле ""(.*)"" данные: ""(.*)""")]
         public void GivenВвожуВПолеДанные(string fieldName, string value)
         {
-            var pageObj = _scenarioContext.Get<BasePageObject>("CurrentPageObj");
+            var pageObj = _scenarioContext.CurrentPage;
             pageObj.SetInput(fieldName, _valueResolver.Resolve(value));
         }
 
@@ -45,7 +44,7 @@ namespace BankroTech.QA.Framework
         [When(@"я нажимаю на кнопку ""(.*)""")]
         public void WhenЯНажимаюНаКнопку(string buttonName)
         {
-            var pageObj = _scenarioContext.Get<BasePageObject>("CurrentPageObj");
+            var pageObj = _scenarioContext.CurrentPage;
             pageObj.ClickButton(buttonName);
         }
 
@@ -54,7 +53,7 @@ namespace BankroTech.QA.Framework
         {
             var pageObj = _waitHelper.WaitForRedirect(pageName);
             Assert.IsNotNull(pageObj);
-            _scenarioContext.Set(pageObj, "CurrentPageObj");
+            _scenarioContext.CurrentPage = pageObj;
         }
 
         [Given(@"я нахожусь на странице ""(.*)""")]
@@ -62,13 +61,13 @@ namespace BankroTech.QA.Framework
         {
             var pageObj = _pageFactory[pageName];
             Assert.IsTrue(pageObj.IsCurrent);
-            _scenarioContext.Set(pageObj, "CurrentPageObj");
+            _scenarioContext.CurrentPage = pageObj;
         }
 
         [Given(@"я раскрываю панель ""(.*)""")]
         public void GivenЯРаскрываюПанель(string elemName)
         {
-            var pageObj = _scenarioContext.Get<BasePageObject>("CurrentPageObj");
+            var pageObj = _scenarioContext.CurrentPage;
             pageObj.ClickOnExpansionPanel(elemName);
         }
 
@@ -77,7 +76,7 @@ namespace BankroTech.QA.Framework
         {
             var pageObj = _waitHelper.WaitForNewTab(pageName);
             Assert.IsNotNull(pageObj);
-            _scenarioContext.Set(pageObj, "CurrentPageObj");
+            _scenarioContext.CurrentPage = pageObj;
         }
     }
 }

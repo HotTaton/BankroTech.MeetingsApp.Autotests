@@ -9,9 +9,9 @@ namespace BankroTech.QA.Framework
         private readonly IWaitHelper _waitHelper;
         private readonly ParamResolverWrapper _paramResolver;
 
-        private readonly ScenarioContext _scenarioContext;
+        private readonly IContextHelper _scenarioContext;
 
-        public APIStepDefinition(ScenarioContext scenarioContext,
+        public APIStepDefinition(IContextHelper scenarioContext,
                                  IWaitHelper waitHelper,
                                  ParamResolverWrapper paramResolver)
         {
@@ -26,7 +26,7 @@ namespace BankroTech.QA.Framework
         {
             _waitHelper.WaitUntilAllAjaxIsCompleted();
             var paramValue = _paramResolver.Resolve(requestUrl);
-            _scenarioContext.Set(paramValue, string.Concat("Param:", paramName).ToUpper());
+            _scenarioContext.SetParameter(paramName, paramValue);                
         }
     }
 }
