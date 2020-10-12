@@ -22,4 +22,4 @@ Scenario: Логин
 	  "Code": "<Параметр, Результат SQL запроса[0].Value>"
 	}
 	"""
-	Then результат "/account/verifyCode[0].IsSuccess" истина
+	Then результат "POST /account/verifyCode[0].IsSuccess" истина

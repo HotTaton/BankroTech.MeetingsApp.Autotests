@@ -110,7 +110,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("посылаю запрос \"/account/verifyCode\" с телом", "{\r\n  \"Code\": \"<Параметр, Результат SQL запроса[0].Value>\"\r\n}", ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 25
- testRunner.Then("результат \"/account/verifyCode[0].IsSuccess\" истина", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("результат \"POST /account/verifyCode[0].IsSuccess\" истина", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

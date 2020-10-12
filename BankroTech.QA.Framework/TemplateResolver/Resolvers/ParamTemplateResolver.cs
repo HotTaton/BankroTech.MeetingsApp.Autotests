@@ -66,11 +66,15 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
 
         private string TryGetResultFromResponseBody(string arg)
         {
-            (var url, var index, var paramName) = ProcessArgument(arg);
+            (var action, var index, var paramName) = ProcessArgument(arg);
+
+            var splittedValue = action.Split(' ');
+            var httpMethod = splittedValue[0].ToUpper();
+            var url = splittedValue[1];
 
             var responseBody = index.HasValue ?
-                                  _httpService.GetResponseBody(url, index.Value) :
-                                  _httpService.GetLastResponseBody(url);
+                                  _httpService.GetResponseBody(httpMethod, url, index.Value) :
+                                  _httpService.GetLastResponseBody(httpMethod, url);
 
             var pathElements = paramName.Split('.');
 

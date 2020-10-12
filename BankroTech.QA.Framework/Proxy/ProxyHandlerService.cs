@@ -25,15 +25,15 @@ namespace BankroTech.QA.Framework.Proxy
             _httpRequestsHistory.Clear();
         }
 
-        public IJEnumerable<JToken> GetResponseBody(string url, int requestIndex)
+        public IJEnumerable<JToken> GetResponseBody(string method, string url, int requestIndex)
         {
-            var httpResponse = GetResponsesByRequestUrl(url).ElementAt(requestIndex);
+            var httpResponse = GetResponsesByRequestUrl(url, method).ElementAt(requestIndex);
             return ParseResponseBody(url, httpResponse);
         }
 
-        public IJEnumerable<JToken> GetLastResponseBody(string url)
+        public IJEnumerable<JToken> GetLastResponseBody(string method, string url)
         {
-            var httpResponse = GetResponsesByRequestUrl(url).Last();
+            var httpResponse = GetResponsesByRequestUrl(method, url).Last();
             return ParseResponseBody(url, httpResponse);
         }
 
@@ -49,10 +49,11 @@ namespace BankroTech.QA.Framework.Proxy
             }
         }
 
-        private IEnumerable<Response> GetResponsesByRequestUrl(string url)
+        private IEnumerable<Response> GetResponsesByRequestUrl(string method, string url)
         {
             var requests = _httpRequestsHistory
-                                .Where(kvp => kvp.Value.RequestUriString.Contains(url, StringComparison.OrdinalIgnoreCase));
+                                .Where(kvp => kvp.Value.RequestUriString.Contains(url, StringComparison.OrdinalIgnoreCase)
+                                                && string.Equals(kvp.Value.Method, method, StringComparison.OrdinalIgnoreCase));
 
             foreach (var request in requests)
             {

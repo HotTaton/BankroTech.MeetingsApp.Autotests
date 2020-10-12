@@ -28,12 +28,12 @@ Scenario: Создание собрания
 	And ввожу в поле "Полное наименование должника" данные: "Кирилл 'Должничок' Тимофеев"
 	And ввожу в поле "Адрес" данные: "Нариманова 2г, кв.82"
 	When я нажимаю на кнопку "Сохранить"	
-	And сохраняю параметр "Id" из результата запроса "/api/meeting/create[0].Result.Id"
+	And сохраняю параметр "Id" из результата запроса "POST /api/meeting/create[0].Result.Id"
 	Then я перехожу на страницу "Текущее собрание"
 	And выполняю запрос 
 	"""
 	SELECT * FROM "Meetings"
-	WHERE "Id" = '<Параметр, /api/meeting/create[0].Result.Id>'
+	WHERE "Id" = '<Параметр, Id>'
 	"""
 	And вижу следующие данные
 	| Name                                            | Debtor_FullName             | Debtor_ShortName |

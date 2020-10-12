@@ -210,14 +210,15 @@ this.FeatureBackground();
  testRunner.When("я нажимаю на кнопку \"Сохранить\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 31
- testRunner.And("сохраняю параметр \"Id\" из результата запроса \"/api/meeting/create[0].Result.Id\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("сохраняю параметр \"Id\" из результата запроса \"POST /api/meeting/create[0].Result." +
+                        "Id\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 32
  testRunner.Then("я перехожу на страницу \"Текущее собрание\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 33
- testRunner.And("выполняю запрос", "SELECT * FROM \"Meetings\"\r\nWHERE \"Id\" = \'<Параметр, /api/meeting/create[0].Result." +
-                        "Id>\'", ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("выполняю запрос", "SELECT * FROM \"Meetings\"\r\nWHERE \"Id\" = \'<Параметр, POST /api/meeting/create[0].Re" +
+                        "sult.Id>\'", ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",

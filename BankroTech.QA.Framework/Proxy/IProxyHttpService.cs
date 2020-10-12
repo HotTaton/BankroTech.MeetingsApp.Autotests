@@ -11,8 +11,8 @@ namespace BankroTech.QA.Framework.Proxy
 
         IReadOnlyDictionary<Guid, Response> HttpResponsesHistory { get; }
 
-        IJEnumerable<JToken> GetResponseBody(string url, int requestIndex);
+        IJEnumerable<JToken> GetResponseBody(string method, string url, int requestIndex);
 
-        IJEnumerable<JToken> GetLastResponseBody(string url);
+        IJEnumerable<JToken> GetLastResponseBody(string method, string url);
     }
 }
