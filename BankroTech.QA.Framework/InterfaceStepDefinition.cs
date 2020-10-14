@@ -13,23 +13,26 @@ namespace BankroTech.QA.Framework
         private readonly ITemplateResolverService _valueResolver;
         private readonly IWaitHelper _waitHelper;
         private readonly IContextHelper _scenarioContext;
+        private readonly IBrowserNavigationService _browserNavigation;
 
         public InterfaceStepDefinition(IContextHelper scenarioContext,
                                        IPageFactory pageFactory,
                                        IWaitHelper waitHelper,
-                                       ITemplateResolverService templateResolver)
+                                       ITemplateResolverService templateResolver,
+                                       IBrowserNavigationService browserNavigation)
         {
             _scenarioContext = scenarioContext;
             _pageFactory = pageFactory;
             _waitHelper = waitHelper;
-            _valueResolver = templateResolver;            
+            _valueResolver = templateResolver;
+            _browserNavigation = browserNavigation;
         }
 
         [Given(@"я захожу на страницу ""(.*)""")]
         public void GivenЯЗахожуНаСтраницу(string pageName)
         {
             var pageObj = _pageFactory[pageName];
-            pageObj.GoToPage();
+            _browserNavigation.NavigateToPage(pageObj);
             _scenarioContext.CurrentPage = pageObj;
         }
 
@@ -48,7 +51,15 @@ namespace BankroTech.QA.Framework
             pageObj.ClickButton(buttonName);
         }
 
-        [Then(@"я перехожу на страницу ""(.*)""")]
+        [Then(@"я перехожу на страницу ""(.*)"" с параметром ""(.*)""")]
+        public void ThenЯПерехожуНаСтраницуСПараметром(string pageName, string param)
+        {
+            var pageObj = _waitHelper.WaitForRedirect(pageName, _valueResolver.Resolve(param));
+            Assert.IsNotNull(pageObj);
+            _scenarioContext.CurrentPage = pageObj;
+        }
+
+        [Then(@"я перехожу на страницу ""([^""]*)""$")]
         public void ThenЯПерехожуНаСтраницу(string pageName)
         {
             var pageObj = _waitHelper.WaitForRedirect(pageName);
@@ -60,7 +71,7 @@ namespace BankroTech.QA.Framework
         public void GivenЯНахожусьНаСтранице(string pageName)
         {
             var pageObj = _pageFactory[pageName];
-            Assert.IsTrue(pageObj.IsCurrent);
+            Assert.IsTrue(_browserNavigation.IsCurrent(pageObj));
             _scenarioContext.CurrentPage = pageObj;
         }
 

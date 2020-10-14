@@ -11,7 +11,7 @@ namespace BankroTech.QA.Framework.PageObjects
 {
     public abstract class BasePageObject
     {        
-        protected string AbsoluteUrl { get; private set; }
+        public string AbsoluteUrl { get; private set; }
         protected abstract string Url { get; }
 
         private Dictionary<string, Func<IWebElement>> _pageElementGetters = new Dictionary<string, Func<IWebElement>>();
@@ -68,25 +68,6 @@ namespace BankroTech.QA.Framework.PageObjects
 
             return default;
         }
-
-        public virtual bool IsCurrent => string.Equals(AbsoluteUrl, WebDriver.Url, StringComparison.OrdinalIgnoreCase);
-
-        public bool GoToParentTab()
-        {
-            foreach (var handler in WebDriver.WindowHandles)
-            {
-                WebDriver.SwitchTo().Window(handler);
-
-                if (IsCurrent)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void GoToPage() => WebDriver.Navigate().GoToUrl(AbsoluteUrl);
 
         public void SetInput(string name, string value) => this[name].SendKeys(value);
 

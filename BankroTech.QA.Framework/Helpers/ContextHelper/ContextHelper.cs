@@ -1,5 +1,4 @@
 ﻿using BankroTech.QA.Framework.PageObjects;
-using System.Collections;
 using System.Collections.Generic;
 using TechTalk.SpecFlow;
 

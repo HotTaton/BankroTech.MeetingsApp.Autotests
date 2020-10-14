@@ -214,11 +214,11 @@ this.FeatureBackground();
                         "Id\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 32
- testRunner.Then("я перехожу на страницу \"Текущее собрание\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("я перехожу на страницу \"Текущее собрание\" с параметром \"MeetingId=<Параметр, Id>\"" +
+                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 33
- testRunner.And("выполняю запрос", "SELECT * FROM \"Meetings\"\r\nWHERE \"Id\" = \'<Параметр, POST /api/meeting/create[0].Re" +
-                        "sult.Id>\'", ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("выполняю запрос", "SELECT * FROM \"Meetings\"\r\nWHERE \"Id\" = \'<Параметр, Id>\'", ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",

@@ -13,12 +13,14 @@ namespace BankroTech.QA.Tests.StepDefinitions
         private readonly FeatureContext _featureContext;
         private readonly IPageFactory _pageFactory;
         private readonly IWaitHelper _waitHelper;
+        private readonly IBrowserNavigationService _browserNavigation;
 
-        public AuthDefinition(FeatureContext featureContext, IPageFactory pageFactory, IWaitHelper waitHelper)
+        public AuthDefinition(FeatureContext featureContext, IPageFactory pageFactory, IWaitHelper waitHelper, IBrowserNavigationService browserNavigation)
         {
             _featureContext = featureContext;
             _pageFactory = pageFactory;
             _waitHelper = waitHelper;
+            _browserNavigation = browserNavigation;
         }
 
         [Given(@"я авторизованный пользователь")]
@@ -28,7 +30,7 @@ namespace BankroTech.QA.Tests.StepDefinitions
                 return;
 
             var pageObj = _pageFactory["Логин"];
-            pageObj.GoToPage();
+            _browserNavigation.NavigateToPage(pageObj);
             pageObj.SetInput("Телефон", "9171864323");
             pageObj.SetInput("Пароль", "12345678");
             pageObj.ClickButton("Войти");

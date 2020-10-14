@@ -17,32 +17,47 @@ namespace BankroTech.QA.Framework.Helpers
         private readonly IWebDriver _webDriver;
         private readonly IPageFactory _pageFactory;
         private readonly IProxyHttpService _httpService;
+        private readonly IBrowserNavigationService _browserNavigation;
 
-        public WaitHelper(IWebDriver webDriver, IPageFactory pageFactory, IProxyHttpService httpService)
+        public WaitHelper(IWebDriver webDriver,
+                          IPageFactory pageFactory,
+                          IProxyHttpService httpService,
+                          IBrowserNavigationService browserNavigation)
         {
             _webDriver = webDriver;
             _pageFactory = pageFactory;
             _httpService = httpService;
+            _browserNavigation = browserNavigation;
         }
 
         public BasePageObject WaitForNewTab(string pageName)
         {
+            return WaitForNewTab(pageName, string.Empty);
+        }
+
+        public BasePageObject WaitForRedirect(string pageName)
+        {
+            return WaitForRedirect(pageName, string.Empty);
+        }
+
+        public BasePageObject WaitForNewTab(string pageName, string args)
+        {
             var page = _pageFactory[pageName];
             var wait = CreateDefaultWait(_webDriver);
 
-            if (wait.Until(driver => page.GoToParentTab()))
+            if (wait.Until(driver => _browserNavigation.GoToParentTab(page, args)))
             {
                 return page;
             }
             return null;
         }
 
-        public BasePageObject WaitForRedirect(string pageName)
+        public BasePageObject WaitForRedirect(string pageName, string args)
         {
             var page = _pageFactory[pageName];
             var wait = CreateDefaultWait(_webDriver);
 
-            if (wait.Until(driver => page.IsCurrent))
+            if (wait.Until(driver => _browserNavigation.IsCurrent(page, args)))
             {
                 return page;
             }

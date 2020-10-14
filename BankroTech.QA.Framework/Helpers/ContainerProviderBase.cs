@@ -59,6 +59,8 @@ namespace BankroTech.QA.Framework.Helpers
 
             builder.RegisterType<RestClientService>().AsSelf().SingleInstance();
 
+            builder.RegisterType<BrowserNavigationService>().As<IBrowserNavigationService>().SingleInstance();
+
             return builder;
         }
     }
