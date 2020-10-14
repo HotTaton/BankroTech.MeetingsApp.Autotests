@@ -16,7 +16,7 @@ namespace BankroTech.QA.Tests.PageObjects
             _waitHelper = waitHelper;
         }
 
-        protected override string Url => "/confirm";
+        protected override string Action => "/confirm";
 
         [PageElement(name: "Код")]
         public IWebElement Phone => WebDriver.FindElement(By.CssSelector("input[name = 'code']"));

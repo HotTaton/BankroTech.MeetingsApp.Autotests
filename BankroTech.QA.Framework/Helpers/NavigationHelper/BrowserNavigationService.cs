@@ -17,41 +17,22 @@ namespace BankroTech.QA.Framework.Helpers
 
         public void NavigateToPage(BasePageObject page)
         {
-            ThrowExceptionIfParameterizedUrl(page.AbsoluteUrl);
-            NavigateToPage(page, string.Empty);
+            _webDriver.Navigate().GoToUrl(page.AbsoluteUrl);
         }
 
-        public void NavigateToPage(BasePageObject page, string parameters)
-        {
-            var parameterizedUrl = SetParameters(page.AbsoluteUrl, parameters);
-            _webDriver.Navigate().GoToUrl(parameterizedUrl);
-        }
 
         public bool IsCurrent(BasePageObject page)
-        {
-            ThrowExceptionIfParameterizedUrl(page.AbsoluteUrl);
-            return IsCurrent(page, string.Empty);
-        }
-
-        public bool IsCurrent(BasePageObject page, string parameters)
-        {
-            var parameterizedUrl = SetParameters(page.AbsoluteUrl, parameters);
-            return string.Equals(parameterizedUrl, _webDriver.Url, StringComparison.OrdinalIgnoreCase);
+        {            
+            return string.Equals(page.AbsoluteUrl, _webDriver.Url, StringComparison.OrdinalIgnoreCase);
         }
 
         public bool GoToParentTab(BasePageObject page)
-        {
-            ThrowExceptionIfParameterizedUrl(page.AbsoluteUrl);
-            return GoToParentTab(page, string.Empty);
-        }
-
-        public bool GoToParentTab(BasePageObject page, string parameters)
         {
             foreach (var handler in _webDriver.WindowHandles)
             {
                 _webDriver.SwitchTo().Window(handler);
 
-                if (IsCurrent(page, parameters))
+                if (IsCurrent(page))
                 {
                     return true;
                 }

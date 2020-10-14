@@ -18,10 +18,16 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
             _httpService = httpService;
         }
 
-        public string GetData(IEnumerable<string> args)
+        public virtual string GetData(IEnumerable<string> args)
         {
             var arg = args.Single();
+            var result = TryGetData(arg);
 
+            return result;
+        }
+
+        protected string TryGetData(string arg)
+        {
             var result = string.Empty;
 
             result = TryGetResultFromContextVariableByName(arg);
@@ -29,10 +35,10 @@ namespace BankroTech.QA.Framework.TemplateResolver.Resolvers
             if (string.IsNullOrEmpty(result))
             {
                 result = TryGetResultFromSqlQueryResult(arg);
-                
+
                 if (string.IsNullOrEmpty(result))
-                {                    
-                    result = TryGetResultFromResponseBody(arg);                                        
+                {
+                    result = TryGetResultFromResponseBody(arg);
                 }
             }
 

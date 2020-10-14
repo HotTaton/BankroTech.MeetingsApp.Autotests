@@ -20,7 +20,8 @@ namespace BankroTech.QA.Framework.TemplateResolver
             {
                 { "Дата", typeof(DateTemplateResolver) },
                 { "Случайное число", typeof(RandomTemplateResolver) },
-                { "Параметр", typeof(ParamTemplateResolver) }
+                { "Параметр", typeof(ParamTemplateResolver) },
+                { "Url", typeof(UrlTemplateResolver) }
             };
         }
 

@@ -10,15 +10,15 @@ using System.Linq.Expressions;
 namespace BankroTech.QA.Framework.PageObjects
 {
     public abstract class BasePageObject
-    {        
-        public string AbsoluteUrl { get; private set; }
-        protected abstract string Url { get; }
-
-        private Dictionary<string, Func<IWebElement>> _pageElementGetters = new Dictionary<string, Func<IWebElement>>();
-
+    {
+        public string AbsoluteUrl => $"{_applicationName}#{Action}";
+        protected abstract string Action { get; }
         protected IWebDriver WebDriver { get; }
 
-        public BasePageObject(IWebDriver webDriver, IConfigurationRoot configuration)
+        private Dictionary<string, Func<IWebElement>> _pageElementGetters = new Dictionary<string, Func<IWebElement>>();
+        private readonly string _applicationName;
+
+        protected BasePageObject(IWebDriver webDriver, IConfigurationRoot configuration)
         {
             WebDriver = webDriver;
 
@@ -27,8 +27,7 @@ namespace BankroTech.QA.Framework.PageObjects
             {
                 applicationName += "/";
             }
-
-            AbsoluteUrl = $"{applicationName}#{Url}";
+            _applicationName = applicationName;            
 
             InitPropertyDictionary();
         }        

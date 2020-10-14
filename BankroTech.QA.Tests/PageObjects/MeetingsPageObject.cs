@@ -8,7 +8,7 @@ namespace BankroTech.QA.Tests.PageObjects
     [PageName(name: "Список собраний")]
     public class MeetingsPageObject : BasePageObject
     {
-        protected override string Url => "/meetings";
+        protected override string Action => "/meetings";
 
         [PageElement(name: "Создать собрание")]
         public IWebElement CreateMeetingBtn => WebDriver.FindElement(By.ClassName("b-floating_button"));

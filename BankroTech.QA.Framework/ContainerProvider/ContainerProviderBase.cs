@@ -35,6 +35,7 @@ namespace BankroTech.QA.Framework.Helpers
             builder.RegisterType<DateTemplateResolver>().AsSelf();
             builder.RegisterType<ParamTemplateResolver>().AsSelf();
             builder.RegisterType<RandomTemplateResolver>().AsSelf();
+            builder.RegisterType<UrlTemplateResolver>().AsSelf();
             builder.RegisterType<TemplateResolverService>().As<ITemplateResolverService>();
                         
             var bindings = AppDomain

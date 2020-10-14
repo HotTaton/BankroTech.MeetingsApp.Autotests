@@ -32,32 +32,22 @@ namespace BankroTech.QA.Framework.Helpers
 
         public BasePageObject WaitForNewTab(string pageName)
         {
-            return WaitForNewTab(pageName, string.Empty);
-        }
-
-        public BasePageObject WaitForRedirect(string pageName)
-        {
-            return WaitForRedirect(pageName, string.Empty);
-        }
-
-        public BasePageObject WaitForNewTab(string pageName, string args)
-        {
             var page = _pageFactory[pageName];
             var wait = CreateDefaultWait(_webDriver);
 
-            if (wait.Until(driver => _browserNavigation.GoToParentTab(page, args)))
+            if (wait.Until(driver => _browserNavigation.GoToParentTab(page)))
             {
                 return page;
             }
             return null;
         }
 
-        public BasePageObject WaitForRedirect(string pageName, string args)
+        public BasePageObject WaitForRedirect(string pageName)
         {
             var page = _pageFactory[pageName];
             var wait = CreateDefaultWait(_webDriver);
 
-            if (wait.Until(driver => _browserNavigation.IsCurrent(page, args)))
+            if (wait.Until(driver => _browserNavigation.IsCurrent(page)))
             {
                 return page;
             }

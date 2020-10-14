@@ -24,7 +24,7 @@ namespace BankroTech.QA.Tests.PageObjects
         [PageElement(name: "Войти")]
         public IWebElement LoginBtn => WebDriver.FindElement(By.ClassName("b-authentication-form-button--auth"));
 
-        protected override string Url => "/login";
+        protected override string Action => "/login";
         #endregion UI Elements
 
         #region Actions     

@@ -8,7 +8,7 @@ namespace BankroTech.QA.Tests.PageObjects
     [PageName(name: "Создание собрания")]
     public class CreateMeetingPageObject : BasePageObject
     {
-        protected override string Url => "/meeting";
+        protected override string Action => "/meeting";
 
         [PageElement(name: "Наименование")]
         public IWebElement Name => WebDriver.FindElement(By.CssSelector("input[name = 'name']"));

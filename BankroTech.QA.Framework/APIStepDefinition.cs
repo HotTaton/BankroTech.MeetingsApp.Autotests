@@ -42,8 +42,9 @@ namespace BankroTech.QA.Framework
         [When(@"посылаю запрос ""(.*)"" с телом")]
         public void GivenПосылаюЗапросСТелом(string action, string jsonBody)
         {
+            var resolvedUrl = _resolverService.Resolve(action);
             var resolvedBody = _resolverService.Resolve(jsonBody);
-            _restClient.PostRequest(action, resolvedBody);
+            _restClient.PostRequest(resolvedUrl, resolvedBody);
         }
 
         [Then(@"результат ""(.*)"" истина")]

@@ -8,8 +8,6 @@ namespace BankroTech.QA.Framework.Helpers
         Cookie WaitForCookie(string cookieName);
         BasePageObject WaitForNewTab(string pageName);
         BasePageObject WaitForRedirect(string pageName);
-        BasePageObject WaitForNewTab(string pageName, string args);
-        BasePageObject WaitForRedirect(string pageName, string args);
         bool WaitUntilAllAjaxIsCompleted();
     }
 }

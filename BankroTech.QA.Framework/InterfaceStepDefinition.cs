@@ -51,15 +51,7 @@ namespace BankroTech.QA.Framework
             pageObj.ClickButton(buttonName);
         }
 
-        [Then(@"я перехожу на страницу ""(.*)"" с параметром ""(.*)""")]
-        public void ThenЯПерехожуНаСтраницуСПараметром(string pageName, string param)
-        {
-            var pageObj = _waitHelper.WaitForRedirect(pageName, _valueResolver.Resolve(param));
-            Assert.IsNotNull(pageObj);
-            _scenarioContext.CurrentPage = pageObj;
-        }
-
-        [Then(@"я перехожу на страницу ""([^""]*)""$")]
+        [Then(@"я перехожу на страницу ""(.*)""")]
         public void ThenЯПерехожуНаСтраницу(string pageName)
         {
             var pageObj = _waitHelper.WaitForRedirect(pageName);
