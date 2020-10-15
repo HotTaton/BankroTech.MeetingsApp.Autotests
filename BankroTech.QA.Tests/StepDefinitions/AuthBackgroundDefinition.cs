@@ -1,7 +1,6 @@
-﻿using BankroTech.QA.Framework.Helpers;
-using BankroTech.QA.Framework.PageObjects.PageFactory;
-using BankroTech.QA.Tests.PageObjects;
-using NUnit.Framework;
+﻿using BankroTech.QA.Framework.API;
+using BankroTech.QA.Framework.Proxy;
+using BankroTech.QA.Framework.SqlDriver;
 using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Tests.StepDefinitions
@@ -11,16 +10,19 @@ namespace BankroTech.QA.Tests.StepDefinitions
     public class AuthDefinition
     {
         private readonly FeatureContext _featureContext;
-        private readonly IPageFactory _pageFactory;
-        private readonly IWaitHelper _waitHelper;
-        private readonly IBrowserNavigationService _browserNavigation;
+        private readonly IProxyHandlerService _proxyHandler;
+        private readonly IRestClientService _restClient;
+        private readonly ISqlDriver _sqlQueryService;
 
-        public AuthDefinition(FeatureContext featureContext, IPageFactory pageFactory, IWaitHelper waitHelper, IBrowserNavigationService browserNavigation)
+        public AuthDefinition(FeatureContext featureContext,                              
+                              IProxyHandlerService proxyHandler,
+                              IRestClientService restClient,
+                              ISqlDriver sqlQueryService)
         {
-            _featureContext = featureContext;
-            _pageFactory = pageFactory;
-            _waitHelper = waitHelper;
-            _browserNavigation = browserNavigation;
+            _featureContext = featureContext;            
+            _proxyHandler = proxyHandler;
+            _restClient = restClient;
+            _sqlQueryService = sqlQueryService;
         }
 
         [Given(@"я авторизованный пользователь")]
@@ -28,18 +30,16 @@ namespace BankroTech.QA.Tests.StepDefinitions
         {
             if (_featureContext.ContainsKey("Auth"))
                 return;
+                        
+            _restClient.PostRequest("/account/login", "{ \"PhoneNumber\": \"79171864323\", \"Password\": \"12345678\" }");
+            var queryResult = _sqlQueryService.ExecuteQuery("SELECT \"Value\" FROM \"AccountTokens\" ORDER BY \"ExpiresAt\" DESC LIMIT 1");
+            var response = _restClient.PostRequest("/account/verifyCode", "{ \"Code\": \"" + queryResult[0]["Value"] + "\" }");
+            var cookies = response.Cookies;
 
-            var pageObj = _pageFactory["Логин"];
-            _browserNavigation.NavigateToPage(pageObj);
-            pageObj.SetInput("Телефон", "9171864323");
-            pageObj.SetInput("Пароль", "12345678");
-            pageObj.ClickButton("Войти");
-            Assert.IsNotNull(_waitHelper.WaitForRedirect("Подтверждение"));
-
-            var confirmationPage = _pageFactory["Подтверждение"] as ConfirmationPage;
-            confirmationPage.ClickButton("Подтвердить");
-            Assert.IsTrue(confirmationPage.LoginSuccessfull());
-            _featureContext.Add("Auth", true);
+            foreach (var cookie in cookies)
+            {
+                _proxyHandler.SetCookie(cookie.Name, cookie.Value);
+            }
         }
     }
 }

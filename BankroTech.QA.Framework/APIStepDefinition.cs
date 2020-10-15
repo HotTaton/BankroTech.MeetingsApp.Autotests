@@ -11,7 +11,7 @@ namespace BankroTech.QA.Framework
     {
         private readonly IWaitHelper _waitHelper;
         private readonly ParamResolverWrapper _paramResolver;
-        private readonly RestClientService _restClient;
+        private readonly IRestClientService _restClient;
         private readonly ITemplateResolverService _resolverService;
 
         private readonly IContextHelper _scenarioContext;
@@ -19,7 +19,7 @@ namespace BankroTech.QA.Framework
         public APIStepDefinition(IContextHelper scenarioContext,
                                  IWaitHelper waitHelper,
                                  ParamResolverWrapper paramResolver,
-                                 RestClientService restClient,
+                                 IRestClientService restClient,
                                  ITemplateResolverService resolverService)
         {
             _scenarioContext = scenarioContext;

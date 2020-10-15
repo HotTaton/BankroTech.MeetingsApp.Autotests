@@ -5,7 +5,7 @@ namespace BankroTech.QA.Framework.Proxy
 {
     public interface IProxyHandlerService
     {
-        void CleanHistory();
+        void SetCookie(string key, string value);        
         Task OnRequest(object sender, SessionEventArgs eventArgs);
         Task OnResponse(object sender, SessionEventArgs eventArgs);
     }

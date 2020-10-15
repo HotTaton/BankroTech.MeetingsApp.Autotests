@@ -6,13 +6,13 @@ using System.Net;
 
 namespace BankroTech.QA.Framework.API
 {
-    public class RestClientService
+    public class RestClientService : IRestClientService
     {
         private readonly IRestClient _client;
 
         public RestClientService(IConfigurationRoot configuration)
         {
-            var applicationName = configuration.GetSection("ApplicationName").Value; 
+            var applicationName = configuration.GetSection("ApplicationName").Value;
             var proxyPort = configuration.GetSection("ProxyPort").Value;
 
             _client = new RestClient(applicationName)

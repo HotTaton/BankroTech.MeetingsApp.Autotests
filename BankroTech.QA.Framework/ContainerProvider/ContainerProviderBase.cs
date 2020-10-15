@@ -58,7 +58,7 @@ namespace BankroTech.QA.Framework.Helpers
 
             builder.RegisterInstance(WebDriverContainer.WebDriver).As<IWebDriver>();
 
-            builder.RegisterType<RestClientService>().AsSelf().SingleInstance();
+            builder.RegisterType<RestClientService>().As<IRestClientService>().SingleInstance();
 
             builder.RegisterType<BrowserNavigationService>().As<IBrowserNavigationService>().SingleInstance();
 

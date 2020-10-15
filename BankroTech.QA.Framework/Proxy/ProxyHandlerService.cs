@@ -13,18 +13,14 @@ namespace BankroTech.QA.Framework.Proxy
     {
         private const string LOGGING_HOST_NAME = "localhost";
         private static readonly string[] _loggingHttpMethods = new string[] { "GET", "POST", "PUT", "DELETE" };
+        private readonly Dictionary<string, string> _cookieJar = new Dictionary<string, string>();
 
         private readonly ConcurrentDictionary<Guid, Request> _httpRequestsHistory = new ConcurrentDictionary<Guid, Request>();
         private readonly ConcurrentDictionary<Guid, Response> _httpResponsesHistory = new ConcurrentDictionary<Guid, Response>();
 
         public IReadOnlyDictionary<Guid, Request> HttpRequestsHistory => _httpRequestsHistory;
         public IReadOnlyDictionary<Guid, Response> HttpResponsesHistory => _httpResponsesHistory;
-
-        public void CleanHistory()
-        {
-            _httpRequestsHistory.Clear();
-        }
-
+        
         public IJEnumerable<JToken> GetResponseBody(string method, string url, int requestIndex)
         {
             var httpResponse = GetResponsesByRequestUrl(url, method).ElementAt(requestIndex);
@@ -61,6 +57,25 @@ namespace BankroTech.QA.Framework.Proxy
             }
         }
 
+        public void CleanHistory()
+        {
+            _httpRequestsHistory.Clear();
+        }
+
+        public void SetCookie(string key, string value)
+        {
+            _cookieJar[key] = value;
+        }
+
+        private void AddCookieHeader(Request request)
+        {
+            if (_cookieJar.Any())
+            {
+                var cookieData = string.Join("; ", _cookieJar.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+                request.Headers.AddHeader("Cookie", cookieData);
+            }
+        }
+
         #region Event delegates
         public async Task OnRequest(object sender, SessionEventArgs eventArgs)
         {
@@ -71,6 +86,7 @@ namespace BankroTech.QA.Framework.Proxy
                 return;
             }
 
+            AddCookieHeader(request);
             if (_loggingHttpMethods.Any(method => string.Equals(method, request.Method, StringComparison.OrdinalIgnoreCase)))
             {
                 if (request.HasBody)
@@ -104,7 +120,7 @@ namespace BankroTech.QA.Framework.Proxy
                 var sessionGuid = (Guid)eventArgs.UserData;
                 _httpResponsesHistory.TryAdd(sessionGuid, response);
             }
-        }
+        }        
         #endregion Event delegates
     }
 }

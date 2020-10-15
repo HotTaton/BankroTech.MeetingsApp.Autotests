@@ -14,5 +14,7 @@ namespace BankroTech.QA.Framework.Proxy
         IJEnumerable<JToken> GetResponseBody(string method, string url, int requestIndex);
 
         IJEnumerable<JToken> GetLastResponseBody(string method, string url);
+
+        void CleanHistory();
     }
 }
