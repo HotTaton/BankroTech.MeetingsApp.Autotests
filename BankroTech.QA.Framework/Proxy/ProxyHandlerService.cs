@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -6,17 +7,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Http;
+using Titanium.Web.Proxy.Models;
 
 namespace BankroTech.QA.Framework.Proxy
 {
-    public class ProxyHandlerService : IProxyHttpService, IProxyHandlerService
-    {
-        private const string LOGGING_HOST_NAME = "localhost";
+    public class ProxyHandlerService : IProxyHttpService, IProxyHandlerService, IProxyCookieService
+    {   
         private static readonly string[] _loggingHttpMethods = new string[] { "GET", "POST", "PUT", "DELETE" };
         private readonly Dictionary<string, string> _cookieJar = new Dictionary<string, string>();
+        private readonly string _loggingHostName;
 
         private readonly ConcurrentDictionary<Guid, Request> _httpRequestsHistory = new ConcurrentDictionary<Guid, Request>();
         private readonly ConcurrentDictionary<Guid, Response> _httpResponsesHistory = new ConcurrentDictionary<Guid, Response>();
+
+        public ProxyHandlerService(IConfigurationRoot configuration)
+        {
+            _loggingHostName = configuration.GetSection("ProxyLoggingHostName").Value;
+        }
 
         public IReadOnlyDictionary<Guid, Request> HttpRequestsHistory => _httpRequestsHistory;
         public IReadOnlyDictionary<Guid, Response> HttpResponsesHistory => _httpResponsesHistory;
@@ -62,6 +69,11 @@ namespace BankroTech.QA.Framework.Proxy
             _httpRequestsHistory.Clear();
         }
 
+        public void ClearCookies()
+        {
+            _cookieJar.Clear();
+        }
+
         public void SetCookie(string key, string value)
         {
             _cookieJar[key] = value;
@@ -71,9 +83,27 @@ namespace BankroTech.QA.Framework.Proxy
         {
             if (_cookieJar.Any())
             {
-                var cookieData = string.Join("; ", _cookieJar.Select(kvp => $"{kvp.Key}={kvp.Value}"));
-                request.Headers.AddHeader("Cookie", cookieData);
+                const string COOKIE_HEADER_NAME = "Cookie";
+
+                if (!request.Headers.HeaderExists(COOKIE_HEADER_NAME))
+                {
+                    var cookieData = string.Join("; ", _cookieJar.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+                    request.Headers.AddHeader(COOKIE_HEADER_NAME, cookieData);
+                }
+                else
+                {
+                    var cookieHeader = request.Headers.GetFirstHeader(COOKIE_HEADER_NAME);
+                    foreach (var cookie in _cookieJar)
+                    {
+                        SetCookieData(cookieHeader, cookie.Key, cookie.Value);
+                    }
+                }
             }
+        }
+
+        private void SetCookieData(HttpHeader header, string cookieName, string cookieValue)
+        {
+            throw new NotImplementedException();
         }
 
         #region Event delegates
@@ -81,7 +111,7 @@ namespace BankroTech.QA.Framework.Proxy
         {
             var request = eventArgs.HttpClient.Request;
 
-            if (!request.RequestUri.Host.Equals(LOGGING_HOST_NAME))
+            if (!request.RequestUri.Host.Equals(_loggingHostName))
             {
                 return;
             }

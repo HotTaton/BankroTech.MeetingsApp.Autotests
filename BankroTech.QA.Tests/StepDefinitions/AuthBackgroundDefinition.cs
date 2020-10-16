@@ -10,17 +10,17 @@ namespace BankroTech.QA.Tests.StepDefinitions
     public class AuthDefinition
     {
         private readonly FeatureContext _featureContext;
-        private readonly IProxyHandlerService _proxyHandler;
+        private readonly IProxyCookieService _proxyCookieContainer;
         private readonly IRestClientService _restClient;
         private readonly ISqlDriver _sqlQueryService;
 
         public AuthDefinition(FeatureContext featureContext,                              
-                              IProxyHandlerService proxyHandler,
+                              IProxyCookieService proxyCookieContainer,
                               IRestClientService restClient,
                               ISqlDriver sqlQueryService)
         {
             _featureContext = featureContext;            
-            _proxyHandler = proxyHandler;
+            _proxyCookieContainer = proxyCookieContainer;
             _restClient = restClient;
             _sqlQueryService = sqlQueryService;
         }
@@ -38,7 +38,7 @@ namespace BankroTech.QA.Tests.StepDefinitions
 
             foreach (var cookie in cookies)
             {
-                _proxyHandler.SetCookie(cookie.Name, cookie.Value);
+                _proxyCookieContainer.SetCookie(cookie.Name, cookie.Value);
             }
         }
     }

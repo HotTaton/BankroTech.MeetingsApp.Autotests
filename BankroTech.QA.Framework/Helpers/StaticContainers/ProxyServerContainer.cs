@@ -6,8 +6,7 @@ using Titanium.Web.Proxy.Network;
 namespace BankroTech.QA.Framework.Helpers
 {
     internal static class ProxyServerContainer
-    {
-        private const int PROXY_PORT = 80;
+    {        
         private static ProxyServer _proxyServer;
 
         public static ProxyServer ProxyServer
@@ -44,7 +43,8 @@ namespace BankroTech.QA.Framework.Helpers
 
         private static void InitProxyEndpoints()
         {
-            var endpoint = new TransparentProxyEndPoint(IPAddress.Loopback, PROXY_PORT, false);
+            var proxyPort = ConfigurationContainer.GetProxyPort();
+            var endpoint = new TransparentProxyEndPoint(IPAddress.Loopback, proxyPort, false);
             _proxyServer.AddEndPoint(endpoint);
         }
     }

@@ -7,6 +7,7 @@ using BankroTech.QA.Framework.Proxy;
 using BankroTech.QA.Framework.SqlDriver;
 using BankroTech.QA.Framework.TemplateResolver;
 using BankroTech.QA.Framework.TemplateResolver.Resolvers;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using System;
 using System.Linq;
@@ -25,9 +26,11 @@ namespace BankroTech.QA.Framework.Helpers
             builder.RegisterType<ParamResolverWrapper>().AsSelf();
             builder.RegisterType<WaitHelper>().As<IWaitHelper>();
             builder.RegisterType<PageFactory>().As<IPageFactory>();
-            
+
+            builder.RegisterInstance(WebDriverContainer.WebDriver).As<IWebDriver>();
+            builder.RegisterInstance(ConfigurationContainer.Configuration).As<IConfigurationRoot>();
             builder.RegisterInstance(ProxyServiceContainer.ProxyHandler)
-                .As<IProxyHandlerService>()
+                .As<IProxyCookieService>()
                 .As<IProxyHttpService>();
 
             builder.RegisterType<PgsqlDriver>().As<ISqlDriver>();
@@ -56,11 +59,9 @@ namespace BankroTech.QA.Framework.Helpers
                                     .ToArray();
             builder.RegisterTypes(pageObjects).SingleInstance();
 
-            builder.RegisterInstance(WebDriverContainer.WebDriver).As<IWebDriver>();
-
             builder.RegisterType<RestClientService>().As<IRestClientService>().SingleInstance();
 
-            builder.RegisterType<BrowserNavigationService>().As<IBrowserNavigationService>().SingleInstance();
+            builder.RegisterType<BrowserNavigationService>().As<IBrowserNavigationService>().SingleInstance();           
 
             return builder;
         }

@@ -4,5 +4,6 @@
   },
   "ProxyPort": 80,
   "ProxyLoggingHostName": "localhost",
-  "ApplicationName": "http://localhost:64507/"
+  "ApplicationName": "http://localhost:64507/",
+  "ScreenshotsLocation": "C:\\Screenshots" 
 }

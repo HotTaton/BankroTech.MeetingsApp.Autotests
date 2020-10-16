@@ -12,7 +12,7 @@ namespace BankroTech.QA.Framework.Helpers
             {
                 if (_proxyHandler == null)
                 {
-                    _proxyHandler = new ProxyHandlerService();
+                    _proxyHandler = new ProxyHandlerService(ConfigurationContainer.Configuration);
                 }
                 return _proxyHandler;
             }
