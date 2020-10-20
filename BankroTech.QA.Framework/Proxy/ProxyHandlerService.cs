@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BankroTech.QA.Framework.Helpers;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
@@ -7,23 +8,35 @@ using System.Linq;
 using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Http;
-using Titanium.Web.Proxy.Models;
 
 namespace BankroTech.QA.Framework.Proxy
 {
-    public class ProxyHandlerService : IProxyHttpService, IProxyHandlerService, IProxyCookieService
-    {   
+    internal class ProxyHandlerService : IProxyHttpService, IProxyHandlerService, IProxyCookieService, IAuthService, IDisposable
+    {
+        private static readonly object locker = new object();
         private static readonly string[] _loggingHttpMethods = new string[] { "GET", "POST", "PUT", "DELETE" };
         private readonly Dictionary<string, string> _cookieJar = new Dictionary<string, string>();
         private readonly string _loggingHostName;
 
         private readonly ConcurrentDictionary<Guid, Request> _httpRequestsHistory = new ConcurrentDictionary<Guid, Request>();
         private readonly ConcurrentDictionary<Guid, Response> _httpResponsesHistory = new ConcurrentDictionary<Guid, Response>();
+        private readonly string _authCookieName;
+        private bool _disposedValue;
 
         public ProxyHandlerService(IConfigurationRoot configuration)
         {
             _loggingHostName = configuration.GetSection("ProxyLoggingHostName").Value;
+            _authCookieName = configuration.GetSection("AuthCookieName").Value;
+
+            //что если в момент регистрации у нас вызовется BeforeRequest?
+            lock (locker)
+            {
+                ProxyServerContainer.ProxyServer.BeforeRequest += OnRequest;
+                ProxyServerContainer.ProxyServer.BeforeResponse += OnResponse;
+            }
         }
+
+        public bool IsAuthorized => _cookieJar.ContainsKey(_authCookieName);
 
         public IReadOnlyDictionary<Guid, Request> HttpRequestsHistory => _httpRequestsHistory;
         public IReadOnlyDictionary<Guid, Response> HttpResponsesHistory => _httpResponsesHistory;
@@ -90,20 +103,58 @@ namespace BankroTech.QA.Framework.Proxy
                     var cookieData = string.Join("; ", _cookieJar.Select(kvp => $"{kvp.Key}={kvp.Value}"));
                     request.Headers.AddHeader(COOKIE_HEADER_NAME, cookieData);
                 }
-                else
+            }
+        }
+                        
+        private void SetCookie(Response response)
+        {
+            const string SET_COOKIE_HEADER_NAME = "Set-Cookie";
+
+            if (response.Headers.HeaderExists(SET_COOKIE_HEADER_NAME))
+            {
+                var setCookieHeaders = response.Headers.GetHeaders(SET_COOKIE_HEADER_NAME);
+
+                foreach (var header in setCookieHeaders)
                 {
-                    var cookieHeader = request.Headers.GetFirstHeader(COOKIE_HEADER_NAME);
-                    foreach (var cookie in _cookieJar)
+                    var headerInfo = header.Value.Split(';');
+                    var cookieInfo = new List<(string key, string val)>();
+
+                    foreach (var kvp in headerInfo)
                     {
-                        SetCookieData(cookieHeader, cookie.Key, cookie.Value);
+                        var splittedKvp = kvp.Split('=');
+                        var key = splittedKvp[0];
+                        var val = splittedKvp.Length > 1 ? splittedKvp[1] : null;
+                        cookieInfo.Add((key, val));
+                    }
+
+                    var maxAge = int.MaxValue;                    
+                    if (cookieInfo.Any(x => x.key.Equals("max-age", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        maxAge = int.Parse(cookieInfo.First(x => x.key.Equals("max-age", StringComparison.OrdinalIgnoreCase)).val);
+                    }
+
+                    var expires = DateTime.MaxValue;
+                    if (cookieInfo.Any(x => x.key.Equals("expires", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        expires = DateTime.Parse(cookieInfo.First(x => x.key.Equals("expires", StringComparison.OrdinalIgnoreCase)).val);
+                    }
+
+                    var cookieValue = cookieInfo[0].val?.Trim();
+
+                    var isExpired = maxAge < 1 || expires < DateTime.Now || string.IsNullOrEmpty(cookieValue);
+                    
+                    var cookieName = cookieInfo[0].key;
+                    
+                    if (isExpired)
+                    {
+                        _cookieJar.Remove(cookieName);
+                    }
+                    else
+                    {
+                        _cookieJar.Add(cookieName, cookieValue);
                     }
                 }
             }
-        }
-
-        private void SetCookieData(HttpHeader header, string cookieName, string cookieValue)
-        {
-            throw new NotImplementedException();
         }
 
         #region Event delegates
@@ -134,7 +185,7 @@ namespace BankroTech.QA.Framework.Proxy
         }
 
         //ToDo: check response type (application/json, etc.)
-        //ToDo: сделать дополнительные проверки на 200 статус (возможно, отдельный метод)
+        //ToDo: сделать дополнительные проверки на 200 статус (возможно, отдельный метод) + 302
         public async Task OnResponse(object sender, SessionEventArgs eventArgs)
         {
             if (eventArgs.UserData != null)
@@ -147,10 +198,26 @@ namespace BankroTech.QA.Framework.Proxy
                     eventArgs.SetResponseBody(responseBody);
                 }
 
+                SetCookie(response);
                 var sessionGuid = (Guid)eventArgs.UserData;
                 _httpResponsesHistory.TryAdd(sessionGuid, response);
             }
-        }        
+        }
         #endregion Event delegates
+
+        public void Dispose()
+        {
+            if (!_disposedValue)
+            {
+                lock (locker)
+                {
+                    ProxyServerContainer.ProxyServer.BeforeRequest -= OnRequest;
+                    ProxyServerContainer.ProxyServer.BeforeResponse -= OnResponse;
+                }
+
+                _disposedValue = true;
+            }
+            GC.SuppressFinalize(this);
+        }
     }
 }

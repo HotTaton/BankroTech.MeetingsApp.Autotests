@@ -1,5 +1,4 @@
-﻿using BankroTech.QA.Framework.TemplateResolver;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System.Data.Common;
 
@@ -7,17 +6,16 @@ namespace BankroTech.QA.Framework.SqlDriver
 {
     public class PgsqlDriver : SqlDriverBase
     {
-        private readonly IConfigurationRoot _configuration;
+        private readonly string connectionString;
 
-        public PgsqlDriver(ITemplateResolverService resolverService, IConfigurationRoot configuration)
-            : base(resolverService)
+        public PgsqlDriver(IConfigurationRoot configuration)            
         {
-            _configuration = configuration;
+            connectionString = configuration.GetConnectionString("OperationalConnection");
         }
 
         protected override DbConnection CreateConnection()
         {
-            return new NpgsqlConnection(_configuration.GetConnectionString("OperationalConnection"));
+            return new NpgsqlConnection(connectionString);
         }
     }
 }

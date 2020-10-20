@@ -1,74 +1,75 @@
-﻿using OpenQA.Selenium;
+﻿using BankroTech.QA.Framework.Extensions;
+using Microsoft.Extensions.Configuration;
+using NUnit.Framework;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.Events;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
+using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Framework.Helpers.ScreenshotMaker
 {
-    internal class ScreenshotService : IScreenshotService
-    {
-        private ConcurrentDictionary<ITakesScreenshot, string> _browserAliases = new ConcurrentDictionary<ITakesScreenshot, string>();
-        private ConcurrentDictionary<ITakesScreenshot, ConcurrentQueue<Screenshot>> _screenshotsContainer = new ConcurrentDictionary<ITakesScreenshot, ConcurrentQueue<Screenshot>>();
+    internal class ScreenshotService : IScreenshotService, IDisposable
+    {        
+        private static readonly ConcurrentDictionary<ITakesScreenshot, ConcurrentQueue<Screenshot>> screenshotsContainer = new ConcurrentDictionary<ITakesScreenshot, ConcurrentQueue<Screenshot>>();
 
-        public void ClearScreenshotCache()
+        private readonly string _screenshotsPath;
+        private readonly string _featureTitle;
+        private readonly EventFiringWebDriver _webDriver;
+
+        public ScreenshotService(IConfigurationRoot configuration, FeatureContext currentFeature, EventFiringWebDriver webDriver)
         {
-            foreach (var kvp in _screenshotsContainer)
-            {
-                kvp.Value.Clear();
-            }
+            _screenshotsPath = configuration.GetSection("ScreenshotsLocation").Value;
+            _featureTitle = currentFeature.FeatureInfo.Title;
+            _webDriver = webDriver;
+            screenshotsContainer.TryAdd(webDriver, new ConcurrentQueue<Screenshot>());
+
+            _webDriver.ElementClicked += new EventHandler<WebElementEventArgs>(TakeScreenshotListener);
+            _webDriver.Navigated += new EventHandler<WebDriverNavigationEventArgs>(TakeScreenshotListener);
+            _webDriver.ElementValueChanged += new EventHandler<WebElementValueEventArgs>(TakeScreenshotListener);
+            _webDriver.ExceptionThrown += new EventHandler<WebDriverExceptionEventArgs>(TakeScreenshotListener);
         }
 
-        public void FlushScreenshots(ITakesScreenshot browser, string path)
+        public void Dispose()
         {
-            if (!_screenshotsContainer.ContainsKey(browser))
-            {
-                return;
-            }
+            screenshotsContainer.TryRemove(_webDriver, out _);
 
-            TakeScreenshot(browser);
-            var browserScreenshotsCache = _screenshotsContainer[browser];
+            _webDriver.ElementClicked -= new EventHandler<WebElementEventArgs>(TakeScreenshotListener);
+            _webDriver.Navigated -= new EventHandler<WebDriverNavigationEventArgs>(TakeScreenshotListener);
+            _webDriver.ElementValueChanged -= new EventHandler<WebElementValueEventArgs>(TakeScreenshotListener);
+            _webDriver.ExceptionThrown -= new EventHandler<WebDriverExceptionEventArgs>(TakeScreenshotListener);
+        }
 
-            if (!path.EndsWith('\\'))
-            {
-                path += "\\";
-            }
-
-            var subfolderName = _browserAliases[browser];
-            var directory = Directory.CreateDirectory(path + subfolderName);
+        public void FlushScreenshots()
+        {
+            TakeScreenshot();
+            var browserScreenshotsCache = screenshotsContainer[_webDriver];
+       
+            var invalidFileNameChars = Path.GetInvalidFileNameChars();
+            var currentTestName = TestContext.CurrentContext.Test.Name;
+            var sanitazedTestName = new string(currentTestName.Where(x => !invalidFileNameChars.Contains(x)).ToArray());
+            var sanitazedFeatureTitle = new string(_featureTitle.Where(x => !invalidFileNameChars.Contains(x)).ToArray());
+                        
+            var directory = Directory.CreateDirectory(Path.Combine(_screenshotsPath, sanitazedFeatureTitle, sanitazedTestName, _webDriver.GetBrowser().ToString()));
 
             var filePosition = 0;
             while (browserScreenshotsCache.TryDequeue(out var screenshot))
             {
-                screenshot.SaveAsFile($"{directory.FullName}\\{filePosition}.png");
+                screenshot.SaveAsFile(Path.Combine(directory.FullName, $"{filePosition}.png"));
                 filePosition++;
             }           
         }
 
-        public void FlushAll(string path)
+        public void TakeScreenshot()
         {
-            foreach (var kvp in _screenshotsContainer)
-            {
-                FlushScreenshots(kvp.Key, path);
-            }
+            screenshotsContainer[_webDriver].Enqueue(_webDriver.GetScreenshot());
         }
 
-        public void TakeScreenshot(ITakesScreenshot browser)
+        private void TakeScreenshotListener<T>(object sender, T eventArgs)
         {
-            if (browser == null || !_screenshotsContainer.ContainsKey(browser))
-            {
-                return;
-            }
-            
-            _screenshotsContainer[browser].Enqueue(browser.GetScreenshot());
+            TakeScreenshot();
         }
-
-        public void RegistrateBrowser(ITakesScreenshot browser, string name)
-        {
-            if (!_browserAliases.ContainsKey(browser))
-            {
-                _screenshotsContainer.TryAdd(browser, new ConcurrentQueue<Screenshot>());
-                _browserAliases.TryAdd(browser, name);
-            }
-        }
-
     }
 }

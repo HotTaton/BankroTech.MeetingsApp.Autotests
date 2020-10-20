@@ -15,8 +15,7 @@ namespace BankroTech.QA.Framework
         [AfterTestRun]
         public static void ReleaseHeavyServices()
         {
-            WebDriverContainer.ScreenshotService.FlushAll(ConfigurationContainer.GetScreenshotsPath());
-            WebDriverContainer.WebDriver.Dispose();
+            WebContextInfo.DisposeAll();
             ProxyServerContainer.ProxyServer.Stop();
         }        
     }

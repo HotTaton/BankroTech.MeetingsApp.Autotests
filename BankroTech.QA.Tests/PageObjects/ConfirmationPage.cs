@@ -10,9 +10,11 @@ namespace BankroTech.QA.Tests.PageObjects
     public class ConfirmationPage : BasePageObject
     {
         private readonly IWaitHelper _waitHelper;
+        private readonly string _authCookieName;
 
         public ConfirmationPage(IWebDriver webDriver, IWaitHelper waitHelper, IConfigurationRoot configuration) : base(webDriver, configuration)
         {
+            _authCookieName = configuration.GetSection("AuthCookieName").Value;
             _waitHelper = waitHelper;
         }
 
@@ -27,12 +29,11 @@ namespace BankroTech.QA.Tests.PageObjects
         //ToDo: отправить в настроечный файлик
         public bool LoginSuccessfull()
         {
-            const string authCookieName = ".AspNetCore.Cookies.64507";
-            if (WebDriver.Manage().Cookies.GetCookieNamed(authCookieName) != null)
+            if (WebDriver.Manage().Cookies.GetCookieNamed(_authCookieName) != null)
             {
                 return true;
             }
-            return _waitHelper.WaitForCookie(authCookieName) != null;
+            return _waitHelper.WaitForCookie(_authCookieName) != null;
         }
     }
 }

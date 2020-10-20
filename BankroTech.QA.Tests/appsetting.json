@@ -5,5 +5,6 @@
   "ProxyPort": 80,
   "ProxyLoggingHostName": "localhost",
   "ApplicationName": "http://localhost:64507/",
-  "ScreenshotsLocation": "C:\\Screenshots" 
+  "ScreenshotsLocation": "C:\\Screenshots",
+  "AuthCookieName": ".AspNetCore.Cookies.64507"
 }

@@ -1,12 +1,11 @@
-﻿using System.Net;
-using Titanium.Web.Proxy;
-using Titanium.Web.Proxy.Models;
+﻿using Titanium.Web.Proxy;
 using Titanium.Web.Proxy.Network;
 
 namespace BankroTech.QA.Framework.Helpers
 {
     internal static class ProxyServerContainer
-    {        
+    {
+        private readonly static object locker = new object();
         private static ProxyServer _proxyServer;
 
         public static ProxyServer ProxyServer
@@ -15,13 +14,15 @@ namespace BankroTech.QA.Framework.Helpers
             {
                 if (_proxyServer == null)
                 {
-                    _proxyServer = new ProxyServer();
+                    lock (locker)
+                    {
+                        if (_proxyServer == null)
+                        {
+                            _proxyServer = new ProxyServer();
 
-                    InstallProxyCertificate();
-                    InitProxyEndpoints();
-
-                    _proxyServer.BeforeRequest += ProxyServiceContainer.ProxyHandler.OnRequest;
-                    _proxyServer.BeforeResponse += ProxyServiceContainer.ProxyHandler.OnResponse;
+                            InstallProxyCertificate();
+                        }                        
+                    }
                 }
 
                 return _proxyServer;
@@ -39,13 +40,6 @@ namespace BankroTech.QA.Framework.Helpers
             {
                 _proxyServer.CertificateManager.CertificateEngine = CertificateEngine.BouncyCastle;
             }
-        }
-
-        private static void InitProxyEndpoints()
-        {
-            var proxyPort = ConfigurationContainer.GetProxyPort();
-            var endpoint = new TransparentProxyEndPoint(IPAddress.Loopback, proxyPort, false);
-            _proxyServer.AddEndPoint(endpoint);
         }
     }
 }

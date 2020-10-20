@@ -10,20 +10,22 @@ namespace BankroTech.QA.Framework
     {        
         private readonly ISqlDriver _sqlQueryService;
         private readonly IContextHelper _scenarioContext;
+        private readonly ITemplateResolverService _templateResolver;
 
         public DbStepDefinition(IContextHelper scenarioContext,
                                 ITemplateResolverService templateResolver,
                                 ISqlDriver sqlQueryService)
         {
             _scenarioContext = scenarioContext;            
-            _sqlQueryService = sqlQueryService;                   
+            _sqlQueryService = sqlQueryService;
+            _templateResolver = templateResolver;
         }
 
         [Given(@"выполняю запрос")]
         [Then(@"выполняю запрос")]
         public void ThenВыполняюЗапрос(string sqlRequest)
         {
-            var queryResult = _sqlQueryService.ExecuteQuery(sqlRequest);
+            var queryResult = _sqlQueryService.ExecuteQuery(_templateResolver.Resolve(sqlRequest));
             _scenarioContext.StoredData = queryResult;                
         }
     }

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +9,7 @@ using System.Linq.Expressions;
 
 namespace BankroTech.QA.Framework.PageObjects
 {
+    //ToDo: remove click and other
     public abstract class BasePageObject
     {
         public string AbsoluteUrl => $"{_applicationName}#{Action}";

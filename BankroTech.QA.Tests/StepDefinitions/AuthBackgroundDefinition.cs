@@ -5,41 +5,32 @@ using TechTalk.SpecFlow;
 
 namespace BankroTech.QA.Tests.StepDefinitions
 {
-    //ToDo можно обернуть какой-нибудь сервис-враппер над IWebDriver и хранить там флаг авторизации
     [Binding]
     public class AuthDefinition
-    {
-        private readonly FeatureContext _featureContext;
-        private readonly IProxyCookieService _proxyCookieContainer;
+    {        
+        private readonly IAuthService _authService;
         private readonly IRestClientService _restClient;
         private readonly ISqlDriver _sqlQueryService;
 
-        public AuthDefinition(FeatureContext featureContext,                              
-                              IProxyCookieService proxyCookieContainer,
+        public AuthDefinition(IAuthService authService,
                               IRestClientService restClient,
                               ISqlDriver sqlQueryService)
-        {
-            _featureContext = featureContext;            
-            _proxyCookieContainer = proxyCookieContainer;
+        {            
+            _authService = authService;
             _restClient = restClient;
             _sqlQueryService = sqlQueryService;
         }
 
+        //ToDo убрать зависимость от контекста
         [Given(@"я авторизованный пользователь")]
         public void GivenАвторизованныйПользователь()
         {
-            if (_featureContext.ContainsKey("Auth"))
+            if (_authService.IsAuthorized)
                 return;
                         
             _restClient.PostRequest("/account/login", "{ \"PhoneNumber\": \"79171864323\", \"Password\": \"12345678\" }");
             var queryResult = _sqlQueryService.ExecuteQuery("SELECT \"Value\" FROM \"AccountTokens\" ORDER BY \"ExpiresAt\" DESC LIMIT 1");
-            var response = _restClient.PostRequest("/account/verifyCode", "{ \"Code\": \"" + queryResult[0]["Value"] + "\" }");
-            var cookies = response.Cookies;
-
-            foreach (var cookie in cookies)
-            {
-                _proxyCookieContainer.SetCookie(cookie.Name, cookie.Value);
-            }
+            _restClient.PostRequest("/account/verifyCode", "{ \"Code\": \"" + queryResult[0]["Value"] + "\" }");            
         }
     }
 }

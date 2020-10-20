@@ -1,31 +1,21 @@
-﻿using BankroTech.QA.Framework.TemplateResolver;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 
 namespace BankroTech.QA.Framework.SqlDriver
 {
     public abstract class SqlDriverBase : ISqlDriver
-    {
-        private readonly ITemplateResolverService _resolverService;
-
-        public SqlDriverBase(ITemplateResolverService resolverService)
-        {
-            _resolverService = resolverService;
-        }
-
+    {       
         protected abstract DbConnection CreateConnection();
 
         public List<Dictionary<string, object>> ExecuteQuery(string query)
         {
-            var resolvedQuery = _resolverService.Resolve(query);
-
             using (var sqlConnection = CreateConnection())
             {
                 sqlConnection.Open();
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = resolvedQuery;
+                    command.CommandText = query;
 
                     using (var reader = command.ExecuteReader())
                     {

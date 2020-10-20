@@ -20,7 +20,6 @@ namespace BankroTech.QA.Framework.Helpers
             _webDriver.Navigate().GoToUrl(page.AbsoluteUrl);
         }
 
-
         public bool IsCurrent(BasePageObject page)
         {            
             return string.Equals(page.AbsoluteUrl, _webDriver.Url, StringComparison.OrdinalIgnoreCase);
@@ -44,40 +43,13 @@ namespace BankroTech.QA.Framework.Helpers
         public Dictionary<string, string> GetParameters(BasePageObject page)
         {
             var result = new Dictionary<string, string>();
-            var urlRegex = Regex.Replace(page.AbsoluteUrl, @"(<\w+>)", MakeParamRegex, RegexOptions.Compiled);
-            var matches = Regex.Match(_webDriver.Url, urlRegex);
+            var urlRegex = Regex.Replace(page.AbsoluteUrl, @"<\w+,\s+(\w+)>", MakeParamRegex, RegexOptions.Compiled);
+            var matches = Regex.Matches(_webDriver.Url, urlRegex);
 
-            foreach (Group group in matches.Groups)
+            foreach (Match match in matches)
             {
+                var group = match.Groups[0];
                 result.Add(group.Name, group.Value);
-            }
-
-            return result;
-        }
-
-        private string SetParameters(string pageUrl, string parameters)
-        {
-            var result = pageUrl;
-
-            if (!string.IsNullOrEmpty(parameters))
-            {
-                var keyValuePairs = parameters.Split('&');
-
-                foreach (var kvp in keyValuePairs)
-                {
-                    var splittedKvp = kvp.Split('=');
-                    var key = splittedKvp[0];
-                    var val = splittedKvp[1];
-
-                    if (result.Contains('?') && result.IndexOf('?') < result.IndexOf($"<{key}>", StringComparison.OrdinalIgnoreCase))
-                    {
-                        result = result.Replace($"<{key}>", kvp, StringComparison.OrdinalIgnoreCase);
-                    }
-                    else
-                    {
-                        result = result.Replace($"<{key}>", val, StringComparison.OrdinalIgnoreCase);
-                    }
-                }
             }
 
             return result;
@@ -85,18 +57,9 @@ namespace BankroTech.QA.Framework.Helpers
 
         private string MakeParamRegex(Match match)
         {
-            var paramName = match.Value.Trim(new char[] { '<', '>' });
+            var paramName = match.Groups[0].Value;
             var result = @$"(?'{paramName}'(?:\w|[\-\.\_\~\:\%\?\#\[\]\@\!\$\'\(\)\*\+\,\;\=])+)";
             return result;
         }
-
-        private void ThrowExceptionIfParameterizedUrl(string url)
-        {
-            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-            {
-                throw new Exception($"You should add parameters to the {url} first!");
-            }
-        }
-
     }
 }

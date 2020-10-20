@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BankroTech.QA.Framework.Helpers;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
@@ -6,20 +7,19 @@ using System.Net;
 
 namespace BankroTech.QA.Framework.API
 {
-    public class RestClientService : IRestClientService
+    internal class RestClientService : IRestClientService
     {
         private readonly IRestClient _client;
 
-        public RestClientService(IConfigurationRoot configuration)
+        public RestClientService(IConfigurationRoot configuration, IWebContextInfo contextInfo)
         {
-            var applicationName = configuration.GetSection("ApplicationName").Value;
-            var proxyPort = configuration.GetSection("ProxyPort").Value;
+            var applicationName = configuration.GetSection("ApplicationName").Value;            
 
             _client = new RestClient(applicationName)
             {
                 Proxy = new WebProxy
                 {
-                    Address = new Uri($"http://localhost:{proxyPort}"),
+                    Address = new Uri($"http://localhost:{contextInfo.Port}"),
                     BypassProxyOnLocal = false,
                     UseDefaultCredentials = true
                 },

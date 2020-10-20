@@ -20,12 +20,10 @@ namespace BankroTech.QA.Framework.TemplateResolver
             {
                 { "Дата", typeof(DateTemplateResolver) },
                 { "Случайное число", typeof(RandomTemplateResolver) },
-                { "Параметр", typeof(ParamTemplateResolver) },
-                { "Url", typeof(UrlTemplateResolver) }
+                { "Параметр", typeof(ParamTemplateResolver) }                
             };
         }
-
-        //ToDo возможна ситуация, когда пройдёт матч, но он не будет иметь ресолвера
+                
         public string Resolve(string baseString)
         {
             var result = new StringBuilder(baseString);
@@ -35,10 +33,13 @@ namespace BankroTech.QA.Framework.TemplateResolver
             foreach (Match match in matches)
             {
                 var splited = match.Value.Split(',').Select(str => str.Trim());
-                var resolverType = _templateResolvers[splited.First()]; //find by name
-                var resolver = (ITemplateResolver)_objectContainer.Resolve(resolverType);
-                var data = resolver.GetData(splited.Skip(1));
-                result.Replace($"<{match.Value}>", data);
+                if (_templateResolvers.ContainsKey(splited.First()))
+                {
+                    var resolverType = _templateResolvers[splited.First()]; //find by name
+                    var resolver = (ITemplateResolver)_objectContainer.Resolve(resolverType);
+                    var data = resolver.GetData(splited.Skip(1));
+                    result.Replace($"<{match.Value}>", data);
+                }                
             }
 
             return result.ToString();
